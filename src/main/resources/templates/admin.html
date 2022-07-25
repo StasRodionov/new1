@@ -16,7 +16,10 @@
         <div class="navbar-brand text-white">
             <b><span class="align-middle" th:text="${user.login}"></span></b>
             <span class="align-middle">with roles:</span>
-            <span class="align-middle" th:text="${user.roles}"></span>
+            <span class="align-middle"
+                  th:each="role : ${user.getRoles()}"
+                  th:text="${role.roleName} + ' '">
+             ></span>
         </div>
         <form th:action="@{/logout}" method="post">
             <button type="submit" class="btn btn-dark text-secondary">Logout</button>
