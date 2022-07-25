@@ -42,8 +42,8 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public User findByEmail(String email) {
-        return userDAO.findByEmail(email);
+    public User getUserByLogin(String login) {
+        return userDAO.getUserByLogin(login);
     }
 
     @Override
@@ -57,8 +57,8 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userDAO.findByEmail(username);
+    public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
+        User user = userDAO.getUserByLogin(login);
         if (user == null) {
             throw new UsernameNotFoundException("User not found");
         }

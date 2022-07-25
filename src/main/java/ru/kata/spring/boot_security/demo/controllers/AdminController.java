@@ -1,6 +1,7 @@
 package ru.kata.spring.boot_security.demo.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -9,7 +10,7 @@ import ru.kata.spring.boot_security.demo.service.RoleService;
 import ru.kata.spring.boot_security.demo.service.UserService;
 
 @Controller
-@RequestMapping("/admin")
+@RequestMapping()
 public class AdminController {
 
     private final UserService userService;
@@ -21,11 +22,25 @@ public class AdminController {
         this.roleService = roleService;
     }
 
-    @GetMapping()
-    public String index(Model model) {
+
+    @GetMapping("/admin")
+    public String allUsers(@AuthenticationPrincipal User user, Model model) {
+
         model.addAttribute("users", userService.getAllUsers());
+       // model.addAttribute("user", userService.getUserByLogin(userDetails.getUsername()));
+        model.addAttribute("user", user);
+        //model.addAttribute("roles", roleService.getAllRoles());
+
         return "admin";
     }
+
+//    @GetMapping("/admin")
+//    public String showAdminPage(@AuthenticationPrincipal User user, Model model) {
+//        model.addAttribute("users", userService.getAllUsers());
+//        model.addAttribute("user", user);
+//        model.addAttribute("roles", roleService.getAllRoles());
+//        return "admin";
+//    }
 
     @GetMapping("/new")
     public String newUser(@ModelAttribute("user") User user, Model model) {
@@ -35,7 +50,8 @@ public class AdminController {
     }
 
     @PostMapping()
-    public String createUser(@ModelAttribute("user") User user) {
+    public String createUser(@ModelAttribute("user") User user, @RequestParam(value = "nameRoles",required = false) String roles) {
+        user.setRoles(roleService.findRolesByName(roles));
         userService.saveUser(user);
         return "redirect:/admin";
     }
@@ -55,11 +71,18 @@ public class AdminController {
 
     @PatchMapping("/{id}")
     public String update (@ModelAttribute("user") User user,
-                          @PathVariable("id") long id) {
+                          @PathVariable("id") long id, @RequestParam(value = "nameRoles", required = false) String roles) {
         userService.getUser(id);
+        user.setRoles(roleService.findRolesByName(roles));
         userService.updateUser(user);
         return "redirect:/admin";
     }
+
+//    @PostMapping("/edit")
+//    public String update(@ModelAttribute("user") User user, @RequestParam("roles") Long id) {
+//        userService.updateUser(user);
+//        return "redirect:/admin";
+//    }
 
     @DeleteMapping("/{id}")
     public String deleteUser(@PathVariable("id") long id) {
